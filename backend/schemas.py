@@ -13,9 +13,11 @@ class UserBase(BaseModel):
     class Config:
         orm_mode = True
 
+
+
 class SignUp(UserBase):
-    dob : str
-    
+    # pic : str
+    # dob : str
     class Config:
         orm_mode : True
 
