@@ -101,3 +101,4 @@ def recover_id(request : schemas.Userid,db: Session = Depends(database.get_db)):
                     f"Hello {user.name},Your recover password is \n{random_password}\nYou can use this password to login to our platform. Thank you.", user.email)
         
         return 'Check your email [also in Spam Box] for password'
+    

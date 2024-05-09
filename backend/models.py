@@ -43,6 +43,7 @@ class Item(Base):
     name = Column(String)
     description = Column(String)
     condition = Column(String)
+    pic = Column(LargeBinary)
     starting_price = Column(Float)
     current_bid = Column(Float)
     auction_end_date = Column(String)

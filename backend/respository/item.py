@@ -1,3 +1,4 @@
+import os
 from sqlalchemy.orm import Session
 from fastapi import Response, HTTPException,status
 import models, schemas
@@ -18,6 +19,15 @@ def list_item(request : schemas.Item, db: Session,seller_id):
                            condition = request.condition,
                            starting_price = request.starting_price,current_bid = request.starting_price,
                            auction_end_date = request.auction_end_date)
+    
+    file_path = os.path.join(request.pic)
+    image_bytes = None
+    with open(file_path, 'rb') as f:
+        image_bytes = f.read()
+    
+    # # Save the image bytes to the database
+    # if image_bytes:
+        new_item.pic = image_bytes
 
     # Add user to the database
     db.add(new_item)

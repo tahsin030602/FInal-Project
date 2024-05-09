@@ -13,17 +13,17 @@ class UserBase(BaseModel):
     class Config:
         orm_mode = True
 
-
-
 class SignUp(UserBase):
-    # pic : str
-    # dob : str
+    dob : str
     class Config:
         orm_mode : True
 
 class ConfirmPass(BaseModel):
     password : str
     confirm_password : str
+
+class Addimage(BaseModel):
+    pic : str
 
 class User(SignUp):
     password : str
@@ -54,11 +54,13 @@ class ShowCategory(Category):
         orm_mode : True
 
 class Item(ItemBase):
+    pic : str
     category : List[str] = []
     class Config:
         orm_mode : True
 
 class showInmain(ItemBase):
+    pic : Optional[bytes]
     item_id : int
     current_bid : float
     seller : UserBase
@@ -119,6 +121,8 @@ class Answer(BaseModel):
 
 class NameUser(BaseModel):
     name : str
+    class Config:
+        orm_mode : True
 
 class getQuetion(BaseModel):
     question_id : int
@@ -155,6 +159,7 @@ class showComment(Comment):
 
 class showItem(ItemBase):
     item_id : int
+    pic : Optional[bytes]
     current_bid : float
     seller : UserBase
     qa : List[showQA] = []
@@ -163,10 +168,19 @@ class showItem(ItemBase):
     class Config:
         orm_mode : True
 
-class Rating(BaseModel):
+class Rate(BaseModel):
     rating : int
     text : str
-    user_id_to : str
+    class Config:
+        orm_mode : True
+
+class Rating(Rate):
+    user_id_from : str
+
+class showRating(Rate):
+    user_from : UserBase
+    class Config:
+        orm_mode : True
     
 class search(BaseModel):
     text : str
@@ -177,3 +191,18 @@ class filter(BaseModel):
     price : int
     class Config:
         orm_mode : True
+
+class UserDetails(UserBase):
+    pic : Optional[bytes]
+    overall_rating : float
+    rates : List[showRating] = []
+    items : List[showInmain] = []
+    class Config:
+        orm_mode : True
+
+class MyDetails(UserDetails):
+    dob : str
+    class Config:
+        orm_mode : True
+
+

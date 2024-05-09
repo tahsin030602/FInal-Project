@@ -20,7 +20,7 @@ def post_comment(request : schemas.Rating,db: Session = Depends(database.get_db)
     if not rate:
         now = datetime.now()
         current_datetime = now.strftime("%Y-%m-%d %H:%M:%S")
-        new_rate = models.Rating(user_id_to = request.user_id_to,user_id_from=current_user.user_id,rating = request.rating,text = request.text,timestamp=current_datetime)
+        new_rate = models.Rating(user_id_to = request.user_id_from,user_id_from=current_user.user_id,rating = request.rating,text = request.text,timestamp=current_datetime)
         db.add(new_rate)
         db.commit()
         db.refresh(new_rate)

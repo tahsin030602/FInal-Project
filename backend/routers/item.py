@@ -1,4 +1,6 @@
+import base64
 from datetime import datetime
+import os
 from fastapi import APIRouter, Depends,status,HTTPException,Response
 from typing import List
 from passlib.context import CryptContext
@@ -45,6 +47,8 @@ def get_item_details(id,db: Session = Depends(database.get_db)):
         comments = get_comment(item_details.item_id,db)
         item_details.qa = qanda
         item_details.comments = comments
+        if item_details.pic:
+            item_details.pic = base64.b64encode(item_details.pic).decode('utf-8')
         return item_details
     
 
@@ -66,7 +70,9 @@ def show_comment(id,db: Session = Depends(database.get_db)):
 @router.get('/get_items', response_model=List[schemas.showInmain], status_code=status.HTTP_200_OK)
 def get_items(db: Session = Depends(database.get_db)):
     items = db.query(models.Item).order_by(models.Item.auction_end_date.desc()).all()
-    
+    for item in items:
+        if item.pic:
+            item.pic = base64.b64encode(item.pic).decode('utf-8')
     return items
 
 @router.post('/search_items', response_model=List[schemas.showInmain], status_code=status.HTTP_200_OK)
@@ -76,6 +82,9 @@ def search_items(request: schemas.search, db: Session = Depends(database.get_db)
               .filter(models.Item.name.ilike(f'%{search_text}%'))\
               .order_by(desc(models.Item.auction_end_date))\
               .all()
+    for item in items:
+        if item.pic:
+            item.pic = base64.b64encode(item.pic).decode('utf-8')
     return items
 
 @router.post('/filter_items', response_model=List[schemas.showInmain], status_code=status.HTTP_200_OK)
@@ -85,9 +94,27 @@ def filter_items(request: schemas.filter, db: Session = Depends(database.get_db)
               .filter(models.Item.starting_price < max_price)\
               .order_by(desc(models.Item.auction_end_date))\
               .all()
-    
+    for item in items:
+        if item.pic:
+            item.pic = base64.b64encode(item.pic).decode('utf-8')
     return items
 
-
-
-
+@router.post('/change_image', status_code=status.HTTP_201_CREATED)
+def change_image(id,request: schemas.Addimage, db: Session = Depends(database.get_db)):
+    item = db.query(models.Item).filter(models.Item.item_id == id).first()
+    
+    # Construct the file path using os.path.join
+    file_path = os.path.join(request.pic)
+    
+    # Open the image file
+    image_bytes = None
+    with open(file_path, 'rb') as f:
+        image_bytes = f.read()
+    
+    # # Save the image bytes to the database
+    # if image_bytes:
+        item.pic = image_bytes
+        db.commit()
+        db.refresh(item)
+    
+    return {"message": "Image uploaded successfully"}
